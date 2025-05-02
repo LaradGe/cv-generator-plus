@@ -1,48 +1,164 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV გენერატორი</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-group .stars {
+            display: flex;
+            gap: 5px;
+        }
+
+        .stars label {
+            cursor: pointer;
+        }
+
+        .add-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-button:hover {
+            background-color: #0056b3;
+        }
+
+        #photo-preview {
+            width: 100px;
+            height: 100px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>შექმენი შენი CV</h1>
-    <form id="cvForm" onsubmit="event.preventDefault(); generatePDF();">
-      <div class="form-group">
-        <label for="name">სახელი, გვარი:</label>
-        <input type="text" id="name" required>
-      </div>
-      <div class="form-group">
-        <label for="email">ელფოსტა:</label>
-        <input type="email" id="email" required>
-      </div>
-      <div class="form-group">
-        <label for="position">პოზიცია:</label>
-        <input type="text" id="position" required>
-      </div>
-      <div class="form-group">
-        <label for="education">განათლება:</label>
-        <textarea id="education" rows="3" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="experience">სამუშაო გამოცდილება:</label>
-        <textarea id="experience" rows="3" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="skills">უნარები და ენები:</label>
-        <textarea id="skills" rows="3" required></textarea>
-      </div>
-      <div class="form-group">
-        <label for="social">სოციალური ქსელები:</label>
-        <input type="text" id="social" placeholder="LinkedIn, GitHub, Facebook">
-      </div>
-      <button type="submit">⬇ გადმოწერე PDF</button>
-    </form>
-  </div>
+    <h1>CV Generator</h1>
+    <form id="cvForm">
+        <!-- სრული სახელი -->
+        <div class="form-group">
+            <label for="fullName">სრული სახელი</label>
+            <input type="text" id="fullName" name="fullName" placeholder="ჩაწერეთ თქვენი სრული სახელი">
+        </div>
 
-  <script src="scripts.js"></script>
+        <!-- დაბადების თარიღი -->
+        <div class="form-group">
+            <label for="birthDate">დაბადების თარიღი</label>
+            <input type="date" id="birthDate" name="birthDate">
+        </div>
+
+        <!-- ტელეფონის ნომერი -->
+        <div class="form-group">
+            <label for="phone">ტელეფონის ნომერი</label>
+            <input type="tel" id="phone" name="phone" placeholder="ჩაწერეთ თქვენი ტელეფონის ნომერი">
+        </div>
+
+        <!-- ელფოსტა -->
+        <div class="form-group">
+            <label for="email">ელფოსტა</label>
+            <input type="email" id="email" name="email" placeholder="ჩაწერეთ თქვენი ელფოსტა">
+        </div>
+
+        <!-- სურათის ატვირთვა -->
+        <div class="form-group">
+            <label for="photo">სურათი</label>
+            <div id="photo-preview">ფოტო</div>
+            <input type="file" id="photo" name="photo" accept="image/*">
+        </div>
+
+        <!-- სამუშაო გამოცდილება -->
+        <h2>სამუშაო გამოცდილება</h2>
+        <div id="experience-container">
+            <div class="form-group">
+                <label for="position">პოზიციის დასახელება</label>
+                <input type="text" name="position[]" placeholder="მაგ: გაყიდვების მენეჯერი">
+            </div>
+            <div class="form-group">
+                <label for="company">კომპანია/ორგანიზაცია</label>
+                <input type="text" name="company[]" placeholder="კომპანიის სახელი">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addExperience()">+ დამატება</button>
+
+        <!-- განათლება -->
+        <h2>განათლება</h2>
+        <div id="education-container">
+            <div class="form-group">
+                <label for="school">სასწავლებლის სახელი</label>
+                <input type="text" name="school[]" placeholder="სასწავლებლის სახელი">
+            </div>
+            <div class="form-group">
+                <label for="specialization">სპეციალობა</label>
+                <input type="text" name="specialization[]" placeholder="სპეციალობა ან მიმართულება">
+            </div>
+            <div class="form-group">
+                <label for="period">განათლების პერიოდი</label>
+                <input type="text" name="period[]" placeholder="მაგ: 2010-2014">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addEducation()">+ დამატება</button>
+
+        <!-- ენები -->
+        <h2>ენების ცოდნა</h2>
+        <div id="languages-container">
+            <div class="form-group">
+                <label>ენა</label>
+                <input type="text" name="language[]" placeholder="ენა">
+                <div class="stars">
+                    <label>★</label>
+                    <label>★</label>
+                    <label>★</label>
+                    <label>★</label>
+                    <label>★</label>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addLanguage()">+ დამატება</button>
+
+        <!-- უნარები -->
+        <h2>უნარები</h2>
+        <div id="skills-container">
+            <div class="form-group">
+                <input type="text" name="skill[]" placeholder="უნარი">
+            </div>
+        </div>
+        <button type="button" class="add-button" onclick="addSkill()">+ დამატება</button>
+
+        <button type="submit" class="add-button">PDF გენერაცია</button>
+    </form>
+
+    <script src="script.js"></script>
 </body>
 </html>
